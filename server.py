@@ -14,7 +14,7 @@ def randomimages():
 	for i in range(20):
 		ids.append(random.randint(0,df.shape[0]))
 	return df[['image_name']].iloc[ids].to_json(orient='records')
-	
+	#recomimages
 @app.route('/recomimages', methods = ['GET'])
 def recomimages():
 	return jsonify(rec.getSet())
@@ -26,12 +26,14 @@ def rate():
 	global count
 	#print(df_r)
 	for r in content:
+		print(r['image_name'])
 		rec.updateUsed(r['image_name'])
 		df_r = df_r.append(pd.DataFrame([[r['image_name'],r['target']]],columns = ['image_name','target']))
 	count += 1
+	
 	if count>=15:
 		df_r.to_csv('likes.csv', index=False)
-		rec.train(df_r)
+		#rec.train(df_r)
 		count = 0
 	#print(df_r)
 	
@@ -44,6 +46,7 @@ def imageById(pid):
 	
 if __name__ == "__main__":
 	rec = Recommender()
+	rec.train(pd.read_csv('likes.csv'))
 	df = pd.read_csv('Selfie-dataset/selfie_dataset.csv')
 	df = df[(df.baby == 0) & (df.child == 0)]
 	df_r = pd.DataFrame()
